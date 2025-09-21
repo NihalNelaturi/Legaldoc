@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LegalDoc - Legal Document Assistant</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #64748b;
+            --light: #f8fafc;
+            --dark: #1e293b;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --border-radius: 8px;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            line-height: 1.6;
+            color: var(--dark);
+            background-color: #f1f5f9;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        /* Header Styles */
+        header {
+            background-color: white;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        header .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+        }
+
+        .logo-icon {
+            margin-right: 0.5rem;
+            font-size: 2rem;
+        }
+
+        nav {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        nav a {
+            color: var(--secondary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        nav a:hover {
+            color: var(--primary);
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 4rem 0;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto 2rem;
+            opacity: 0.9;
+        }
+
+        /* Main Content */
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+            padding: 3rem 0;
+        }
+
+        @media (min-width: 992px) {
+            .main-content {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .section {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            box-shadow: var(--shadow);
+        }
+
+        .section h2 {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+        }
+
+        .section-icon {
+            margin-right: 0.75rem;
+            font-size: 1.8rem;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 300px;
+            padding: 1rem;
+            border: 1px solid #e2e8f0;
+            border-radius: var(--border-radius);
+            font-family: inherit;
+            font-size: 1rem;
+            resize: vertical;
+            transition: var(--transition);
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .output-display {
+            min-height: 300px;
+            padding: 1rem;
+            border: 1px solid #e2e8f0;
+            border-radius: var(--border-radius);
+            background-color: #f8fafc;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            line-height: 1.6;
+        }
+
+        .actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .cta-button {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .cta-button:hover:not(:disabled) {
+            background-color: var(--primary-dark);
+        }
+
+        .button-secondary {
+            background-color: #e2e8f0;
+            color: var(--dark);
+        }
+
+        .button-secondary:hover:not(:disabled) {
+            background-color: #cbd5e1;
+        }
+
+        .button-copy {
+            background-color: var(--success);
+            color: white;
+        }
+
+        .button-copy:hover:not(:disabled) {
+            background-color: #0da271;
+        }
+
+        .disclaimer {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background-color: #fffbeb;
+            border-left: 4px solid var(--warning);
+            border-radius: var(--border-radius);
+            font-size: 0.9rem;
+            color: var(--dark);
+        }
+
+        /* Loading and Status Indicators */
+        .loading-indicator {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            color: var(--secondary);
+        }
+
+        .spinner {
+            width: 24px;
+            height: 24px;
+            border: 3px solid rgba(37, 99, 235, 0.2);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 1s linear infinite;
+            margin-right: 0.75rem;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            padding: 1rem;
+            background-color: #fef2f2;
+            border-left: 4px solid var(--danger);
+            border-radius: var(--border-radius);
+            color: var(--danger);
+            font-weight: 500;
+        }
+
+        .success-message {
+            padding: 1rem;
+            background-color: #f0fdf4;
+            border-left: 4px solid var(--success);
+            border-radius: var(--border-radius);
+            color: var(--success);
+            font-weight: 500;
+        }
+
+        /* Footer */
+        footer {
+            background-color: white;
+            border-top: 1px solid #e2e8f0;
+            padding: 2rem 0;
+            margin-top: 3rem;
+            text-align: center;
+            color: var(--secondary);
+        }
+
+        footer a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Character count */
+        .char-count {
+            text-align: right;
+            font-size: 0.875rem;
+            color: var(--secondary);
+            margin-top: 0.5rem;
+        }
+
+        /* Animation for streaming text */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .streaming-text {
+            animation: fadeIn 0.5s ease;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <script type="text/babel">
+        const { useState } = React;
+
+        function App() {
+            const [inputText, setInputText] = useState('');
+            const [outputText, setOutputText] = useState('');
+            const [isLoading, setIsLoading] = useState(false);
+            const [error, setError] = useState('');
+            const [isCopied, setIsCopied] = useState(false);
+
+            const handleAnalyze = async () => {
+                if (!inputText.trim()) return;
+
+                setIsLoading(true);
+                setError('');
+                setOutputText('');
+                setIsCopied(false);
+
+                try {
+                    const endpointUrl = '/chat';
+                    const response = await fetch(endpointUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ 
+                            question: "Please summarize and explain this legal document in plain language", 
+                            document: inputText 
+                        }),
+                    });
+
+                    if (!response.ok) {
+                        const errorText = await response.text().catch(() => 'Could not read error response.');
+                        throw new Error(`Request failed: ${response.status} ${errorText}`);
+                    }
+
+                    const data = await response.json();
+                    setOutputText(data.response || "No response received from the server.");
+                } catch (e) {
+                    setError('An error occurred while analyzing the text. Please try again.');
+                    console.error('Analysis error:', e);
+                } finally {
+                    setIsLoading(false);
+                }
+            };
+
+            const handleClear = () => {
+                setInputText('');
+                setError('');
+            };
+            
+            const handleReset = () => {
+                setInputText('');
+                setOutputText('');
+                setError('');
+                setIsCopied(false);
+            }
+
+            const handleCopy = () => {
+                if (!outputText) return;
+                navigator.clipboard.writeText(outputText).then(() => {
+                    setIsCopied(true);
+                    setTimeout(() => setIsCopied(false), 2000);
+                }).catch(err => {
+                    console.error('Failed to copy text: ', err);
+                });
+            };
+
+            const renderOutput = () => {
+                if (isLoading) {
+                    return (
+                        <div className="loading-indicator">
+                            <div className="spinner"></div>
+                            Analyzing your legal document...
+                        </div>
+                    );
+                }
+                if (error) {
+                    return <div className="error-message">{error}</div>;
+                }
+                if (outputText) {
+                    return <div className="streaming-text">{outputText}</div>;
+                }
+                return <p>Your simplified explanation will appear here after you paste and analyze your text.</p>;
+            }
+
+            return (
+                <>
+                    <header>
+                        <div className="container">
+                            <div className="logo">
+                                <span className="logo-icon">⚖️</span>
+                                LegalDoc
+                            </div>
+                            <nav>
+                                <a href="#about">About</a>
+                                <a href="#privacy">Privacy</a>
+                                <a href="#contact">Contact</a>
+                            </nav>
+                        </div>
+                    </header>
+
+                    <main>
+                        <section className="hero">
+                            <div className="container">
+                                <h1>Understand Legal Documents with AI</h1>
+                                <p>Paste your complex legal text, and LegalDoc instantly simplifies jargon into plain, actionable English.</p>
+                                <button className="cta-button" onClick={() => document.getElementById('input-area').scrollIntoView({ behavior: 'smooth' })}>
+                                    Start Simplifying Now
+                                </button>
+                            </div>
+                        </section>
+
+                        <div className="container">
+                            <div className="main-content" id="input-area">
+                                <section className="section">
+                                    <h2>
+                                        <span className="section-icon">📄</span>
+                                        Paste Your Legal Text
+                                    </h2>
+                                    <textarea 
+                                        value={inputText}
+                                        onChange={(e) => setInputText(e.target.value)}
+                                        placeholder="e.g., 'This lease agreement, entered into on...', 'Notwithstanding any other provision...'"
+                                        aria-label="Legal text input"
+                                        disabled={isLoading}
+                                    />
+                                    <div className="char-count">
+                                        {inputText.length} characters
+                                    </div>
+                                    <div className="actions">
+                                        <button onClick={handleClear} className="button-secondary" disabled={!inputText || isLoading}>
+                                            Clear Text
+                                        </button>
+                                        <button onClick={handleAnalyze} className="cta-button" disabled={!inputText.trim() || isLoading}>
+                                            {isLoading ? (
+                                                <>Analyzing <div className="spinner" style={{width: '16px', height: '16px', marginLeft: '8px'}}></div></>
+                                            ) : (
+                                                'Analyze Document'
+                                            )}
+                                        </button>
+                                    </div>
+                                </section>
+
+                                <section className="section">
+                                    <h2>
+                                        <span className="section-icon">📝</span>
+                                        Simplified Explanation
+                                    </h2>
+                                    <div className="output-display" aria-live="polite">
+                                       {renderOutput()}
+                                    </div>
+                                    <div className="actions">
+                                        <button onClick={handleReset} className="button-secondary">
+                                            Analyze New Text
+                                        </button>
+                                        <button onClick={handleCopy} className="button-copy" disabled={!outputText || isLoading}>
+                                            {isCopied ? 'Copied!' : 'Copy Explanation'}
+                                        </button>
+                                    </div>
+                                    <div className="disclaimer">
+                                        <strong>Disclaimer:</strong> LegalDoc provides AI-powered summaries for informational purposes only and does not constitute legal advice. Consult a qualified legal professional for advice.
+                                    </div>
+                                </section>
+                            </div>
+                        </div>
+                    </main>
+
+                    <footer>
+                        <div className="container">
+                            <p>© {new Date().getFullYear()} LegalDoc | <a href="#privacy">Privacy Policy</a> | <a href="#terms">Terms of Service</a></p>
+                        </div>
+                    </footer>
+                </>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
